@@ -1,0 +1,236 @@
+
+zh-CN:
+  activerecord:
+    model:
+      customer: 客户
+      member: 账户
+      note: 客户沟通记录
+      product: 产品
+      transaction_record: 成交产品
+      ddb_account: 点单宝帐号
+      item: 财务流水
+      stock_item: 采购
+      sale_item: 销售
+      order: 订单
+      zone: 区域
+      system_config: 系统设置
+      faq: 常见客户问题解答
+      navigation: 网址导航
+      visit_note: 拜访记录
+      person: 面谈对象
+      communication_note: 电话沟通记录
+      department: 部门
+
+    attributes:
+      navigation:
+        name: 网站名称
+        link: 网址
+      faq:
+        title: 标题
+        question: 客户问题
+        answer: 推荐回答
+        member: 最后编辑
+        updated_at: 最后编辑时间
+        created_at: 创建时间
+      department:
+        name: 部门名字
+        members_count: 部门人数
+        members: 在职部门成员
+
+      system_config:
+        key: 索引键
+        value: 值
+      item:
+        name: 交易名称
+        type: 交易类型
+        amount: 交易金额
+        partner: 合作成单同事
+        applier: 经办人
+        description: 描述
+        approver: 审批人
+        transaction_time: 支付时间
+        workflow_state: 流水状态
+        invoice: 收据或发票抬头
+        reason: 拒绝理由
+        department: 部门
+        bank_account_id: 收款银行账户
+        ddb_account_id: 点单宝帐号
+      sale_item:
+        order: 订单编号
+        bank_account: 收款银行账户
+        order_id: 订单编号
+        saler: 签单销售
+        saler_id: 签单销售
+        product: 签单产品
+        product_id: 签单产品
+        description: 交易详情
+        customer: 客户
+        customer_id: 客户
+        ddb_account: 点单宝帐号
+        time_gap: 服务期限
+        has_balance_due: 是否有尾款未支付
+        balance_due: 尾款金额
+        due_date: 预期尾款支付时间
+        due_item: 已支付尾款
+        due_item_id: 已支付尾款
+      person:
+        name: 姓名
+        phone: 手机
+        wechat_number: 微信号
+        pos: 职位
+        created_at: 创建时间
+      ddb_account:
+        name: 客户姓名
+        title: 点单宝帐号名称
+        slug: 点单宝帐号短称
+        email: 点单宝帐号Email
+        customer: 客户
+        customer_id: 客户
+        member: 经办人
+        member_id: 经办人
+        zone: 所属区域
+      member:
+        can_accept_new: 是否可参与随即分配客户
+        is_blocked: 阻止登录
+        email: 电子邮箱
+        role: 职务
+        name: 姓名
+        password: 密码
+        customer_share_threshold: 可接管客户比例
+        password_confirmation: 重复密码
+        customers_count: 累计开发客户数量
+        current_password: 旧密码
+        department_id: 所属部门
+        department: 所属部门
+        bank_card_type: 银行卡类型
+        bank_card_number: 银行卡号
+
+      customer:
+        wechat_number: 微信号
+        last_member: 当前接管销售
+        last_member_id: 当前归属销售
+        last_updated_at: 接管时间
+        created_at: 创建时间
+        name: 客户姓名
+        level: 客户质量度
+        qq: QQ
+        email: 电子邮箱
+        introduction: 客户需求简介
+        from: 客户通过什么方式开始知道我们
+        vip_level: 客户质量
+        shop_type: 商户类型
+        member: 创建者
+        member_id: 创建者
+        workflow_state: 客户开发状态
+        is_agent: 是否是代理
+        agent_type: 代理类型
+        zones: 区域
+        pool: 公共客户池
+        area: 区域
+        province: 省、自治区、直辖市
+        city: 城市
+        updated_at: 更新时间
+      order:
+        human_order_id: 订单编号
+        amount: 订单金额
+        workflow_state: 订单状态
+        note: 成交时沟通记录
+      note:
+        content: 沟通详情
+        from_state: 修改前状态
+        to_state: 修改后状态
+        event: 修改后状态
+        workflow_state: 客户开发状态
+        transaction_records: 成交产品
+        order_id: 订单编号
+      visit_note:
+        visit_at: 拜访时间
+        visit_reason: 拜访目的
+      alarm:
+        time: 时间
+        ahead: 显示提醒时间
+      bank_account:
+        name: 账户名称
+        owner: 账户管理者
+        income: 该账户累计进账金额
+        description: 账户描述
+      product:
+        name: 产品名称
+        price: 产品价格
+        description: 产品描述
+      transaction_record:
+        product: 成交产品
+        amount: 成交价格
+        saler: 签单销售
+        customer: 客户
+        member: 经办人
+        product_id: 成交产品
+        saler_id: 签单销售
+        member_id: 经办人
+      zone:
+        name: 区域名称
+        parent_zone_id: 上级区域
+        parent_zone: 上级区域
+      zone_type: 区域级别
+      phone:
+        number: 电话号码
+
+  Show: 详情
+  Edit: 编辑
+  Destroy: 删除
+  Back: 返回
+  Save: 保存
+  Accept: 批准
+  Cancel: 关闭
+  Reject: 拒绝
+
+  customer:
+    workflow_state:
+      new: 开始接触
+      contacting: 联系洽谈中
+      free_trial: 免费试用
+      accepted: 成交
+      rejected: 放弃
+    agent_type:
+      exclusive_agent: 独家代理
+      agent: 分销代理
+    vip_level:
+      potential: 潜在客户
+      normal: 一般客户
+      important: 重点客户
+    shop_type:
+      single: 单店网络版
+      service: 单店营销版
+      chain: 多店连锁版
+      multiple: 本地生活商圈
+      agent: 代理
+  role:
+    worker: 员工
+    admin: 管理员
+  sale_item:
+    workflow_state:
+      new: 等待审核
+      accepted: 批准通过
+      rejected: 被拒绝
+      canceled: 交易已关闭
+  stock_item:
+    workflow_state:
+      new: 等待审核
+      accepted: 批准通过
+      rejected: 被拒绝
+      canceled: 交易已关闭
+  order:
+    workflow_state:
+      new: 已成交
+      closed: 已关闭
+      note: 成交时沟通记录
+      canceld: 已取消
+  zone:
+    zone_type:
+      province: 省、自治区、直辖市
+      capital: 省会
+      city: 地级市
+      town: 县、县级市
+  will_paginate:
+    previous_label: 上一页
+    next_label: 下一页

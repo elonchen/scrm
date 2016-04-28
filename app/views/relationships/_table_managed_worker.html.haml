@@ -1,0 +1,17 @@
+= will_paginate @workers, renderer: BootstrapPagination::Rails
+%table.table.table-striped#managed_workers_table
+  %tr
+    %th= Member.human_attribute_name(:name)
+    %th= Member.human_attribute_name(:email)
+    %th= "本月提成"
+    %th= "操作"
+    %th
+  - @workers.each do |worker|
+    %tr
+      %td= worker.name
+      %td= worker.email
+      %td= ""
+      %td
+        =form_for(@manager.active_relationships.find_by(:worker_id => worker.id), html: {method: :delete}, remote: true) do |f|
+          = f.submit "Delete", class: "btn btn-danger", :data => { :confirm => 'Are you sure?' }
+= will_paginate @workers, renderer: BootstrapPagination::Rails

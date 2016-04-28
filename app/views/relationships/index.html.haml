@@ -1,0 +1,33 @@
+.panel.panel-primary
+  .panel-heading
+    %h2.panel-title 经理下属员工
+  .panel-body
+    - @managers.each do |manager|
+      %p
+        %b
+          = "经理姓名"
+          \:
+        %span= link_to manager.name, relationship_path(manager)
+      %br
+      %b= "下属员工列表"
+      - @manager = manager
+      - @workers = manager.workers.paginate(page: params[:page], :per_page => 25)
+      = render "table_managed_worker"
+      / = render "index_relationships_table"
+      / %br
+      / %table.table.table-striped
+      /   %tr
+      /     %th= Member.human_attribute_name(:name)
+      /     %th= Member.human_attribute_name(:email)
+      /     %th= "本月提成"
+      /     %th= "操作"
+      /     %th
+      /     - manager.workers.each do |worker|
+      /       - if !worker.nil?
+      /         %tr
+      /           %td= worker.name
+      /           %td= worker.email
+      /           %td= ""
+      /           %td
+      /             =form_for(manager.active_relationships.find_by(:worker_id => worker.id), html: {method: :delete}, remote: true) do |f|
+      /               = f.submit "Delete", class: "btn btn-danger", :data => { :confirm => 'Are you sure?' }

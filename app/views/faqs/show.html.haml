@@ -1,0 +1,30 @@
+%p#notice= notice
+
+%p
+  %b
+    = Faq.human_attribute_name(:title)
+    \:
+  = @faq.title
+%p
+  %b
+    = Faq.human_attribute_name(:member)
+    \:
+  = @faq.member.name rescue nil
+  \(
+  = @faq.updated_at.strftime("%Y-%m-%d %H:%M") rescue nil
+  \)
+%p
+  %b
+    = Faq.human_attribute_name(:question)
+    \:
+  = @faq.question
+%p
+  %b
+    = Faq.human_attribute_name(:answer)
+    \:
+  = raw @faq.answer
+
+
+= link_to t('Edit'), edit_faq_path(@faq), :class=>"btn btn-default"
+\|
+= link_to t('Back'), faqs_path, :class=>"btn btn-default"

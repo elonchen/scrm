@@ -1,0 +1,27 @@
+%p#notice= notice
+
+%p
+  %b
+    = BankAccount.human_attribute_name(:name)
+    \:
+  = @bank_account.name
+%p
+  %b
+    = BankAccount.human_attribute_name(:owner)
+    \:
+  = link_to @bank_account.owner.name, @bank_account.owner
+%p
+  %b
+    = BankAccount.human_attribute_name(:description)
+    \:
+  = @bank_account.description
+- if current_member.has_role? :admin
+  %p
+    %b
+      = BankAccount.human_attribute_name(:income)
+      \:
+    = number_to_currency(@bank_account.sale_items.with_accepted_state.inject(0){|sum, item| sum += item.amount}, :unit=>'¥')
+
+= link_to t('Edit'), edit_bank_account_path(@bank_account), :class=>"btn btn-default"
+\|
+= link_to t('Back'), bank_accounts_path, :class=>"btn btn-default"

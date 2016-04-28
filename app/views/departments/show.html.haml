@@ -1,0 +1,28 @@
+%p#notice= notice
+
+%p
+  %b
+    = Department.human_attribute_name(:name)
+    \:
+  = @department.name
+%p
+  %b
+    = Department.human_attribute_name(:members_count)
+    \:
+  = @department.members_count
+%p
+  %b
+    = Department.human_attribute_name(:members)
+    \:
+  - @department.members.of_normal.each do |member|
+    = link_to member.try(:name), member
+%p
+  %b
+    已离职部门成员
+    \:
+  - @department.members.of_quit.each do |member|
+    = link_to member.try(:name), member 
+
+= link_to t('Edit'), edit_department_path(@department), :class=>"btn btn-default"
+\|
+= link_to t('Back'), departments_path, :class=>"btn btn-default"

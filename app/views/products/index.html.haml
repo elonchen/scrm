@@ -1,0 +1,22 @@
+%h1 产品列表
+
+%table.table.table-striped
+  %tr
+    %th= Product.human_attribute_name(:name)
+    %th= Product.human_attribute_name(:price)
+    %th= Product.human_attribute_name(:description)
+    %th
+
+  - @products.each do |product|
+    %tr
+      %td= product.name
+      %td= number_to_currency(product.price, :unit=>"¥")
+      %td= product.description
+      %td
+        = link_to t('Show'), product, :class=>"btn btn-default"
+        = link_to t('Edit'), edit_product_path(product), :class=>"btn btn-default"
+        = link_to t('Destroy'), product, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class=>"btn btn-danger"
+
+%br
+
+= link_to "新建产品", new_product_path, :class=>"btn btn-default"

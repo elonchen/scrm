@@ -1,0 +1,102 @@
+<% title "订单详情" %>
+
+<div class="panel panel-default">
+  <div class="panel-heading">订单详情
+  </div>
+  <div class="panel-body">
+<p>
+  <strong><%= Order.human_attribute_name(:human_order_id) %>:</strong>
+  <%= @order.human_order_id %>
+</p>
+<p>
+  <strong><%= Order.human_attribute_name(:amount) %>:</strong>
+  <%= number_to_currency(@order.amount, :unit=>"¥") %>
+  (
+  <% unless @order.has_pay_all? %>
+  欠款<span class="label label-danger"><%= number_to_currency(@order.money_not_paid, :unit=>"¥") %></span>
+  <% else %>
+    款项已付清
+  <% end %>)
+</p>
+<p>
+  <strong><%= Order.human_attribute_name(:workflow_state) %>:</strong>
+  <%= @order.workflow_state_name %>
+</p>
+<p>
+  <strong><%= Order.human_attribute_name(:note) %>:</strong>
+  <%= @order.note.content %>
+</p>
+  </div>
+</div>
+<div class="panel panel-info">
+  <div class="panel-heading">订单交易记录
+  </div>
+  <div class="panel-body">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th><%= TransactionRecord.human_attribute_name(:product)%>
+          </th>
+          <th>
+            <%= TransactionRecord.human_attribute_name(:amount) %>
+          </th>
+          <th>
+            <%= TransactionRecord.human_attribute_name(:customer)%>
+          </th>
+          <th>
+            <%= TransactionRecord.human_attribute_name(:saler)%>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @order.transaction_records.each do |trasaction_record| %>
+          <tr>
+              <td><%= link_to trasaction_record.product.name , trasaction_record.product%>
+              </td>
+              <td><%= number_to_currency(trasaction_record.amount, :unit=>'¥')%>
+              </td>
+              <td><%= link_to trasaction_record.customer.name , trasaction_record.customer%>
+              </td>
+              <td><%= link_to trasaction_record.saler.name , trasaction_record.saler%>
+              </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="panel panel-danger">
+  <div class="panel-heading">付款流水记录
+  </div>
+  <div class="panel-body">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th><%= Item.human_attribute_name(:name)%>
+          </th>
+          <th>
+            <%= Item.human_attribute_name(:amount) %>
+          </th>
+          <th>
+            <%= Item.human_attribute_name(:description)%>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @order.sale_items.with_accepted_state.each do |sale_item| %>
+          <tr>
+              <td><%= link_to sale_item.name , sale_item%>
+              </td>
+              <td><%= number_to_currency(sale_item.amount, :unit=>'¥')%>
+              </td>
+              <td><%= sale_item.description%>
+              </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<p>
+  <%= link_to t("Back"), orders_path, :class=>"btn btn-default" %>
+</p>

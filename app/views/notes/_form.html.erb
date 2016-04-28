@@ -1,0 +1,84 @@
+<%= simple_nested_form_for [@customer, @note] do |f| %>
+  <%= f.error_messages %>
+  <% if f.object.new_record? %>
+    <%= f.input :event, collection: Customer.workflow_spec.states[@customer.workflow_state.to_sym].events.map{|event| [@customer.workflow_state_name(event[1][0].transitions_to), event[1][0]]} %>
+  <% else %>
+    <%= f.label :event %>
+    <% if @note.from_state == @note.to_state %>
+        <%= workflow_state_name(@note.from_state) %>
+    <% else %>
+      <%= workflow_state_name(@note.from_state) %> => <%= workflow_state_name(@note.to_state) %>
+    <% end %>
+  <% end %>
+  <%- if f.object.is_visit_note? %>
+    <%= f.input :visit_at %>
+    <%= f.simple_fields_for :person do |p| %>
+      <%= p.input :name %>
+      <%= p.input :phone, required: true%>
+      <%= p.input :wechat_number, required: true %>
+      <%= p.input :pos %>
+    <% end %>
+  <% end %>
+  <%- if f.object.is_visit_note? && f.object.new_record? %>
+    <%= f.input :visit_reason %>
+  <% else %>
+    <%= f.input :content %>
+  <% end %>
+
+  <div id="transaction-records-div" class="panel panel-default">
+    <div class="panel-heading">
+      成交产品列表
+    </div>
+    <div class="panel-body">
+      <table class="table table-striped" id="transaction-records">
+        <%= f.fields_for :transaction_records, :wrapper => false do |task_form| %>
+          <tr class="fields">
+          <td><%= task_form.input :product_id, collection: Product.all.map{|product| [product.name, product.id]} %></td>
+          <td><%= task_form.input :saler_id, collection: Member.all.map{|member| [member.name||member.email, member.id]} %></td>
+          <td><%= task_form.input :amount %></td>
+          <td><%= task_form.link_to_remove "删除成交产品", :class=>"btn btn-danger",  :data => { :target => "#transaction-records" } %></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+    <div class="panel-footer"><%= f.link_to_add "添加成交产品", :transaction_records,:class=>"btn btn-primary",  :data => { :target => "#transaction-records" } %></div>
+  </div>
+
+
+    <div id="alarm-records-div" class="panel panel-default">
+      <div class="panel-heading">
+        提醒日期列表
+      </div>
+      <div class="panel-body">
+        <table class="table table-striped" id="alarm-records">
+          <%= f.fields_for :alarms, :wrapper => false do |alarm_form| %>
+              <tr class="fields">
+                <td><%= alarm_form.input :time, as: :datetime %></td>
+                <td><%= alarm_form.input :ahead, as: :datetime %></td>
+                <td><%= alarm_form.input :description %></td>
+                <td><%= alarm_form.link_to_remove "删除提醒", :class=>"btn btn-danger",  :data => { :target => "#alarm-records" } %></td>
+              </tr>
+          <% end %>
+        </table>
+      </div>
+      <div class="panel-footer"><%= f.link_to_add "添加提醒", :alarms,:class=>"btn btn-primary",  :data => { :target => "#alarm-records" } %></div>
+    </div>
+
+    <p><%= f.submit :class=>"btn btn-default" %></p>
+
+<% end %>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#transaction-records-div').hide();
+    $('#communication_note_event').on('change', function(e){
+      if(e.target.value === 'pay'){
+        $('#transaction-records-div').show();
+      }else{
+        $('#transaction-records').html('');
+        $('#transaction-records-div').hide();
+      }
+    });
+    $('#communication_note_event').trigger('change');
+  });
+</script>

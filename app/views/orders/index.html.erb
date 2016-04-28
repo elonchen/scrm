@@ -1,0 +1,34 @@
+<% title "订单列表" %>
+
+<%= search_form_for(@q, :html=>{:class=>"form-inline", :role=>"form", :style=>"margin: 10px;"}) do |f|%>
+  <div class="form-group">
+    <%= f.label :human_order_id%>
+    <%= f.text_field :human_order_id_cont, :class=>"form-control"%>
+  </div>
+  <%= f.submit "搜索", :class=>"btn btn-default"%>
+<%end%>
+
+<table class="table table-striped">
+  <tr>
+    <th><%= Order.human_attribute_name(:human_order_id) %></th>
+    <th><%= Order.human_attribute_name(:amount) %></th>
+    <th class="col-sm-3"><%= Order.human_attribute_name(:note) %></th>
+    <th><%= Order.human_attribute_name(:workflow_state) %></th>
+    <th></th>
+  </tr>
+  <% for order in @orders %>
+    <tr>
+      <td><%= order.human_order_id %></td>
+      <td><%= number_to_currency(order.amount, :unit=>"¥")%><% unless order.has_pay_all? %>
+  (欠款<span class="label label-danger"><%= number_to_currency(order.money_not_paid, :unit=>"¥") %></span>)
+  <% end %></td>
+      <td><%= order.note.content %></td>
+      <td><%= order.workflow_state_name %></td>
+      <td><%= link_to t("Show"), order, :class=>"btn btn-default" %></td>
+    </tr>
+  <% end %>
+</table>
+
+<br/>
+<%= will_paginate @orders, renderer: BootstrapPagination::Rails %>
+

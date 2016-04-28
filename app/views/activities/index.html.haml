@@ -1,0 +1,18 @@
+%h1 最近活动列表
+= will_paginate @collection, renderer: BootstrapPagination::Rails
+%table.table.table-striped
+  %tbody
+    - @activities.each do |activity|
+      %tr
+        %td
+          - if activity.created_at < 3.days.ago
+            = "#{activity.created_at.strftime("%Y-%m-%d %H:%M:%S")} "
+          - else
+            = "#{time_ago_in_words(activity.created_at)}前 "
+          - if activity.owner
+            = link_to activity.owner.name||activity.owner.email, activity.owner if activity.owner
+          - else
+            系统
+          = render_activity activity
+
+= will_paginate @collection, renderer: BootstrapPagination::Rails

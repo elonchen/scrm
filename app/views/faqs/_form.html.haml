@@ -1,0 +1,14 @@
+= simple_form_for(@faq) do |f|
+  = f.error_notification
+
+  .form-inputs
+    = f.input :title
+    = f.input :question
+    .form-group
+      %label.col-sm-2.control-label
+        = Faq.human_attribute_name(:answer)
+      .input-group.col-sm-10
+        = f.cktext_area :answer, :ckeditor => {:language => 'zh_CN'}
+
+  .form-actions{style:"margin:10px 0;"}
+    = f.button :submit, :class=>"btn btn-primary"

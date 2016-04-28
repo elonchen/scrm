@@ -1,0 +1,8 @@
+= simple_form_for(@member) do |f|
+  = f.input :email
+  = f.input :name
+  = f.input :password
+  = f.association :department
+  = f.input :bank_card_type, collection: Member::BANK_CARD_TYPES
+  = f.input :bank_card_number
+  = f.submit t('Save'), :class=>"btn btn-default"

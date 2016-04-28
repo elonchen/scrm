@@ -1,0 +1,6 @@
+新开发了一个客户
+%a{:href=> "#{customer_path(activity.trackable_id)}"}
+  %span.label.label-danger
+    = Customer.with_deleted.find(activity.trackable_id).name
+- unless activity.trackable
+  ,但是该客户当前已经被删除

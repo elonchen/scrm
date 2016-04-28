@@ -1,0 +1,42 @@
+%h1 沟通记录统计
+
+.row-fluid
+  = search_form_for(@q, :url=> statistics_notes_path(@q), :html=>{:class=>'form-inline', :role=>'form'}) do |f|
+    .form-group.col-xs-4
+      = f.label '开始时间'
+      = f.text_field :created_at_gteq, as: :datetime, :class => 'form-control', :placeholder => 'yyyy-MM-dd HH:mm:ss'
+    .form-group.col-xs-4
+      = f.label '结束时间'
+      = f.text_field :created_at_lteq, as: :datetime, :class => 'form-control', :placeholder => 'yyyy-MM-dd HH:mm:ss'
+    .form-group.col-xs-4
+      = f.submit '搜索', :class=>'btn btn-default'
+
+%br
+
+%h3
+  统计时间
+  %span(style='color:red')= @first
+  ='~'
+  %span(style='color:red')= @last
+
+%table.table.table-striped
+  %tr
+    %th= Member.human_attribute_name(:id)
+    %th= Member.human_attribute_name(:name)
+    %th 客户数
+    %th 沟通记录数
+    %th
+
+  - @results.each do |result|
+    %tr
+      %td
+        = result.member_id
+      %td
+        = result.name
+      %td
+        = result.customer_count
+      %td
+        = result.note_count
+
+%br
+= will_paginate @results, renderer: BootstrapPagination::Rails

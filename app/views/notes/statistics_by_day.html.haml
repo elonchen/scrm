@@ -1,0 +1,49 @@
+%h1 沟通记录统计
+
+.row-fluid
+  = search_form_for(@q, :url=> statistics_by_day_notes_path(@q), :html=>{:class=>'form-inline', :role=>'form'}) do |f|
+    .form-group.col-xs-4
+      = f.label '开始时间'
+      = f.text_field :created_at_gteq, as: :datetime, :class => 'form-control', :placeholder => 'yyyy-MM-dd HH:mm:ss'
+    .form-group.col-xs-4
+      = f.label '结束时间'
+      = f.text_field :created_at_lteq, as: :datetime, :class => 'form-control', :placeholder => 'yyyy-MM-dd HH:mm:ss'
+    .form-group.col-xs-4
+      = f.submit '搜索', :class=>'btn btn-default'
+%br
+
+%h3
+  统计时间
+  %span(style='color:red')= @first
+  ='~'
+  %span(style='color:red')= @last
+
+%h3
+  值格式
+  %span(style='color:blue') 客户数
+  |
+  %span(style='color:green') 沟通记录数
+  (客户数小于30标红)
+
+%table.table.table-striped
+  %tr
+    %th= Member.human_attribute_name(:name)
+    - @results.each do |result_of_day|
+      %th= result_of_day[:date]
+
+  - @members.each do |member|
+    %tr
+      %td
+        = member
+      - @results.each do |result_of_day|
+        %td
+          - hit = result_of_day[:results].select { |rst| rst.name == member }.first
+          %p.text-nowrap
+            - if hit.present?
+              %span.customer-count(style="color:#{hit.customer_count < 30 ? 'red':'blue'}")= hit.customer_count
+              |
+              %span.note-count(style='color:green')= hit.note_count
+            - else
+              无
+%br
+-#= will_paginate @results, renderer: BootstrapPagination::Rails

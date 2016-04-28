@@ -1,0 +1,40 @@
+%p#notice= notice
+.panel.panel-default
+  .panel-heading 区域详情
+  .panel-body
+    %p
+      %b
+        = Zone.human_attribute_name(:name)
+        \:
+      = @zone.name
+    %p
+      %b 是否有独家代理:
+      = @zone.agents.exclusive_agent.present? ? "有" : "没有"
+
+    - if @zone.agents.exclusive_agent.present?
+      %p
+        %b 独家代理:
+        - @zone.agents.exclusive_agent.each do |agent|
+          = link_to agent.name, agent
+    - if @zone.agents.normal_agent.present?
+      %p
+        %b 分销代理:
+        - @zone.agents.normal_agent.each do |agent|
+          = link_to agent.name, agent
+    %p
+      %b
+        = Zone.human_attribute_name(:zone_type)
+        \:
+      = @zone.zone_type_name
+    - if @zone.parent_zone.present?
+      %p
+        %b
+          = Zone.human_attribute_name(:parent_zone)
+          \:
+        = @zone.parent_zone.name rescue nil
+    下辖子区域
+    = render :partial=>"index_records", :locals=>{zones: @zone.zones}
+
+= link_to t('Edit'), edit_zone_path(@zone), :class=>"btn btn-default"
+\|
+= link_to t('Back'), @zone.parent_zone ? zone_path(@zone.parent_zone) : zones_path, :class=>"btn btn-default"

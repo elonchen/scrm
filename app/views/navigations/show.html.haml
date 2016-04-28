@@ -1,0 +1,16 @@
+%p#notice= notice
+
+%p
+  %b
+    = Navigation.human_attribute_name(:name)
+    \:
+  = @navigation.name
+%p
+  %b
+    = Navigation.human_attribute_name(:link)
+    \:
+  = @navigation.link
+
+= link_to t('Edit'), edit_navigation_path(@navigation), :class=>"btn btn-default"
+\|
+= link_to t('Back'), navigations_path, :class=>"btn btn-default"

@@ -1,0 +1,22 @@
+= simple_form_for(@ddb_account) do |f|
+  - if @ddb_account.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@ddb_account.errors.count, "error")} prohibited this customer from being saved:"
+      %ul
+        - @ddb_account.errors.full_messages.each do |msg|
+          %li= msg
+
+  .form-inputs
+    = f.input :name
+    = f.input :customer_id, input_html:{data:{ url: customers_path , saved: (@ddb_account.new_record? ? @ddb_account.customer_id :  @ddb_account.customer.select_json ), single: true} , class: 'ddb-select2'}
+    = f.input :email
+    = f.input :phone
+    = f.input :title
+    = f.input :slug
+    = f.association :zone
+    = f.association :member, label_method: :name
+
+  .form-actions
+    = f.button :submit
+:javascript
+  init_ddb_select2()

@@ -1,0 +1,44 @@
+%h1 点单宝帐号列表
+
+.row-fluid
+  = link_to '新建点单宝帐号', new_ddb_account_path, :class=>"btn btn-primary"
+  = search_form_for(@q, :html=>{:class=>"form-inline pull-right", :role=>"form"}) do |f|
+    .form-group
+      = f.label :name
+      = f.text_field :name_cont, :class=>"form-control"
+    .form-group
+      = f.label :email
+      = f.text_field :email_cont, :class=>"form-control"
+    .form-group
+      = f.label :slug
+      = f.text_field :slug_cont, :class=>"form-control"
+    .form-group
+      = f.label :title
+      = f.text_field :title_cont, :class=>"form-control"
+    = f.submit "搜索", :class=>"btn btn-default"
+%br
+
+%table.table.table-striped
+  %tr
+    %th= DdbAccount.human_attribute_name(:name)
+    %th= DdbAccount.human_attribute_name(:email)
+    %th= DdbAccount.human_attribute_name(:title)
+    %th= DdbAccount.human_attribute_name(:member)
+    %th
+
+  - @ddb_accounts.each do |ddb_account|
+    %tr
+      %td= link_to ddb_account.name,  ddb_account.customer
+      %td= ddb_account.email
+      %td
+        = ddb_account.title
+        = "(#{DdbAccount.human_attribute_name(:slug)})"
+      %td= link_to ddb_account.member.name, ddb_account.member
+      %td
+        = link_to t('Show'), ddb_account, :class=>"btn btn-default"
+        = link_to t('Edit'), edit_ddb_account_path(ddb_account), :class=>"btn btn-default"
+        = link_to t('Destroy'), ddb_account, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class=>"btn btn-danger"
+
+%br
+= will_paginate @ddb_accounts, renderer: BootstrapPagination::Rails
+

@@ -1,0 +1,1 @@
+VALID_EMAIL_ADDRESS_REGEX = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i

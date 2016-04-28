@@ -1,0 +1,44 @@
+= simple_form_for(@item, :html=>{:class=>"form-horizontal", :role=>"form"}) do |f|
+  - if @item.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@item.errors.count, "error")} prohibited this customer from being saved:"
+      %ul
+        - @item.errors.full_messages.each do |msg|
+          %li= msg
+
+  .form-inputs
+    = f.input :name
+    = f.input :amount
+    = f.input :description
+    = f.input :transaction_time
+    - if @item.is_sale_item?
+      = f.association :partner, collection: Member.of_normal.where("id != #{current_member.id}").map{|partner| ["#{partner.name}", partner.id]}, input_html: { class: "selectpicker form-control", data: {:"live-search" => true, :"allow_blank"=>true}}
+      = f.input :invoice, hint: "如需收据或发票请务必填写抬头，并在描述里进一步注明实际情况"
+      = f.input :bank_account_id , input_html:{data: {url: bank_accounts_path ,saved: @item.new_record? ? @item.bank_account_id : @item.bank_account.select_json ,single: true} , class: 'ddb-select2'}
+      = f.association :order, collection: Order.with_new_state.map{|order| ["#{order.human_order_id} —— 创建时间 #{order.created_at.strftime("%Y-%m-%d %H:%M:%S")}", order.id]}, input_html: { class: "selectpicker form-control", data: {:"live-search" => true}}
+      = f.input :ddb_account_id , input_html: {data:{url: ddb_accounts_path ,saved: @item.new_record? ? @item.ddb_account_id : @item.ddb_account.select_json , single: true} ,class: 'ddb-select2'}
+      = f.input :time_gap
+      = f.input :has_balance_due,:as => :boolean, :wrapper => :checkbox
+      = f.input :balance_due
+      = f.input :due_date
+
+  .form-actions
+    = f.button :submit
+
+:javascript
+  $(document).ready(function(){
+    $('#sale_item_has_balance_due').on("change", function(){
+      if($(this).is(":checked")){
+        $(".sale_item_balance_due").show();
+        $(".sale_item_due_date").show();
+      }else{
+        $(".sale_item_balance_due").hide();
+        $(".sale_item_due_date").hide();
+      }
+    });
+
+    $('.selectpicker').selectpicker();
+
+    $('#sale_item_has_balance_due').trigger('change');
+  });
+  init_ddb_select2()

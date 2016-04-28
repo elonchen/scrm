@@ -1,0 +1,10 @@
+更新了客户
+- if activity.trackable
+  = link_to activity.trackable.name, activity.trackable
+  的信息
+- else
+  = link_to Customer.only_deleted.find(activity.trackable_id).name , customer_path(activity.trackable_id)
+  的信息,该客户当前已经被删除
+%br
+%small
+  = raw changes_reason(activity).join('<br/>')

@@ -1,0 +1,96 @@
+!!!
+%html
+  %head
+    %meta{:content=>'text/html; charset=UTF-8', :"http-equiv"=>'Content-Type'}
+  %body
+    %h1= "恭喜您，您的财务流水#{@subject}已经审批通过"
+    %p
+      %b
+        = Item.human_attribute_name(:name)
+        \:
+      = @item.name
+    %p
+      %b
+        = Item.human_attribute_name(:type)
+        \:
+      = item_type_name(@item)
+    %p
+      %b
+        = Item.human_attribute_name(:workflow_state)
+        \:
+        = @item.workflow_state_name
+    %p
+      %b
+        = Item.human_attribute_name(:amount)
+        \:
+      = number_to_currency(@item.amount, :unit=>"¥")
+
+    %p
+      %b
+        = Item.human_attribute_name(:transaction_time)
+        \:
+      = @item.transaction_time.strftime("%Y-%m-%d %H:%M:%S") rescue nil
+
+    %p
+      %b
+        = Item.human_attribute_name(:description)
+        \:
+      = @item.description
+
+    - if @item.is_sale_item? and @item.bank_account.present?
+      %p
+        %b
+          = SaleItem.human_attribute_name(:bank_account)
+          \:
+        = link_to @item.bank_account.name, @item.bank_account
+      %p
+        %b
+          = SaleItem.human_attribute_name(:order)
+          \:
+        = link_to @item.order.human_order_id, @item.order
+      %p
+        %b
+          = SaleItem.human_attribute_name(:ddb_account)
+          \:
+        = @item.ddb_account.name rescue nil
+      %p
+        %b
+          = SaleItem.human_attribute_name(:time_gap)
+          \:
+        = @item.time_gap
+      %p
+        %b
+          = SaleItem.human_attribute_name(:has_balance_due)
+          \:
+        - if @item.has_balance_due?
+          有
+        - else
+          没有
+      - if @item.has_balance_due?
+        %p
+          %b
+            = SaleItem.human_attribute_name(:balance_due)
+            \:
+          = number_to_currency(@item.balance_due, :unit=>"¥")
+        %p
+          %b
+            = SaleItem.human_attribute_name(:due_date)
+            \:
+          = @item.due_date.strftime("%Y-%m-%d %H:%M:%S")
+        - if @item.due_item.present?
+          %p
+            %b
+              = SaleItem.human_attribute_name(:due_item)
+              \:
+            = link_to @item.due_item.name, @item.due_item
+
+    %p
+      %b
+        = Item.human_attribute_name(:applier)
+        \:
+      = @item.applier.name rescue nil
+    %p
+      %b
+        = Item.human_attribute_name(:approver)
+        \:
+      = @item.approver.name rescue nil

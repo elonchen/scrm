@@ -1,0 +1,132 @@
+%h1
+  - if params[:type].nil? or params[:type] == 'items'
+    财务流水列表
+  - elsif params[:type] == "SaleItem"
+    收入流水列表
+  - elsif params[:type] == "StockItem"
+    支出流水列表
+
+.row-fluid
+  - if params[:type].nil? or params[:type] == 'items' or params[:type] == "SaleItem"
+    = link_to '新建收入流水', sti_item_path(SaleItem.to_s, nil, 'new'), :class=>"btn btn-default"
+    -#= link_to '导入收入流水', '#', id: 'import_items', :class=>"btn btn-default", :'data-url'=> '/sale_items/import'
+  - if params[:type].nil? or params[:type] == 'items' or params[:type] == "StockItem"
+    = link_to '新建支出流水', sti_item_path(StockItem.to_s,nil, 'new'), :class=>"btn btn-default"
+    = link_to '导入支出流水', '', id: 'import_items', :class=>"btn btn-default", :'data-url'=>'/stock_items/import'
+
+.space(style="margin-top:10px")
+
+.row-fluid
+  = search_form_for(@q, :html=>{:class=>'form-horizontal', :role=>'form'}) do |f|
+    .form-group
+      .col-xs-4
+        = f.label :applier_name, '经办人'
+        = f.text_field :applier_name_cont, class: 'form-control'
+    .form-group
+      .col-xs-4
+        = f.submit '搜索', :class=>'btn btn-default'
+
+%br
+= will_paginate @collection, renderer: BootstrapPagination::Rails
+%table.table.table-striped
+  %tr
+    %th= sort_link(@q, :name, Item.human_attribute_name(:name))
+    %th= sort_link(@q, :amount, Item.human_attribute_name(:amount))
+    %th= sort_link(@q, :description, Item.human_attribute_name(:description))
+    %th= sort_link(@q, :transaction_time, Item.human_attribute_name(:transaction_time))
+    %th= sort_link(@q, :workflow_state, Item.human_attribute_name(:workflow_state))
+    %th= sort_link(@q, :applier, Item.human_attribute_name(:applier))
+    %th= sort_link(@q, :approver, Item.human_attribute_name(:approver))
+    %th= sort_link(@q, :created_at, Item.human_attribute_name(:created_at))
+    %th
+
+  - @items.each do |item|
+    %tr
+      %td= item.name
+      %td
+        = number_to_currency(item.amount, :unit=>'¥')
+        - if item.has_balance_due
+          %br
+          \(
+          = SaleItem.human_attribute_name(:balance_due)
+          \:
+          %span.label.label-info
+            = number_to_currency(item.balance_due, :unit=>"¥")
+          \)
+        %br
+        - if item.is_sale_item? && item.bank_account.present?
+          %b
+            = SaleItem.human_attribute_name(:bank_account)
+            \:
+          = link_to item.bank_account.name, item.bank_account
+
+      %td
+        = SaleItem.human_attribute_name(:partner)
+        \:
+        - if item.try(:partner).present?
+          = link_to item.partner.name, item.partner
+        - else
+          无
+        %br
+        = SaleItem.human_attribute_name(:invoice)
+        \:
+        = item.invoice.presence||"<无>"
+        %br
+        = item.description
+      %td= item.transaction_time.strftime("%Y-%m-%d %H:%M:%S") rescue nil
+      %td
+        %span.label.label-info
+          = item.workflow_state_name
+      %td= item.applier.name
+      %td= item.approver.name rescue nil
+      %td= item.created_at.strftime("%F %T")
+      %td
+        = link_to t('Show'), sti_item_path(item.type, item, nil), :class=>"btn btn-default"
+        - if current_member == item.applier and item.current_state == :new
+          = link_to t('Cancel'), sti_item_path(item.type, item, 'cancel'), :method => :put, :data => { :confirm => '你确定要关闭此项申请吗？?' }, :class=>"btn btn-danger"
+        - if current_member.has_role? :admin  and item.current_state == :new
+          %a.reject-link.btn.btn-danger 拒绝
+          = link_to t('Reject'), sti_item_path(item.type, item, 'reject'), :id => 'real-reject-link', :method => :put, :class=>"btn btn-danger hidden"
+          = link_to t('Accept'), sti_item_path(item.type, item, 'accept'), :method => :put, :data => { :confirm => '你确定要批准此项流水吗？?' }, :class=>"btn btn-danger"
+
+:javascript
+  $(function(){
+    var uploader = new ss.SimpleUpload({
+      button: 'import_items', // HTML element used as upload button
+      //url: $('#import_items').data().url, // URL of server-side upload handler
+      url: '/stock_items/import', // URL of server-side upload handler
+      name: 'uploadfile', // Parameter name of the uploaded file
+      responseType: 'json',
+      allowedExtensions: ['csv'],
+      maxSize: 1024*1024,
+      customHeaders: {'X-CSRF-Token': $('meta[name=csrf-token]').attr("content")},
+      //onSubmit: function(filename, extension) {
+        //alert("on submit");
+      //},
+      onComplete: function(filename, response) {
+        if (!response) {
+            alert(filename + 'upload failed');
+            return false;
+        }
+        // do something with response...
+        alert("导入成功");
+      }
+    });
+    $(".reject-link").on("click", function(){
+      var reason = prompt("请输入拒绝原因")
+      if (reason != null){
+        if (reason.length > 0){
+          var realLink = $(this).next()
+          var url = realLink.attr("href")
+          var idx = url.indexOf("reason=")
+          if (idx == -1){
+            url = url + "?reason=" + reason
+          }else{
+            url = url.substring(0, idx + "?reason=".length) + reason
+          }
+          realLink.attr("href", url)
+        }
+        realLink.click()
+      }
+    });
+  });

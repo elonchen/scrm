@@ -1,0 +1,26 @@
+%h1 部门列表
+
+%table.table.table-striped
+  %thead
+    %tr
+      %th= Department.human_attribute_name(:name)
+      %th= Department.human_attribute_name(:members_count)
+      %th= Department.human_attribute_name(:members)
+      %th
+
+  %tbody
+    - @departments.each do |department|
+      %tr
+        %td= department.name
+        %td= department.members_count
+        %td
+          - department.members.of_normal.each do |member|
+            = link_to member.try(:name), member
+        %td
+          = link_to t('Show'), department, class: 'btn btn-default'
+          = link_to t('Edit'), edit_department_path(department), class: 'btn btn-default'
+          = link_to t('Destroy'), department, :method => :delete, :data => { :confirm => 'Are you sure?' }, class: "btn btn-danger"
+
+%br
+
+= link_to '新建部门', new_department_path, class: 'btn btn-default'

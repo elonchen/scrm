@@ -1,0 +1,112 @@
+= search_form_for(@q, url: statistics_items_path,:html=>{:class=>"form-inline pull-right", :role=>"form"}) do |f|
+  .form-group
+    = f.label :applier_id, "经办人"
+    = f.select :applier_id_eq, options_for_select(Member.all.map{|m| [m.name, m.id]}), {:include_blank => true}
+  .form-group
+    = f.label :bank_account_id, "银行账户"
+    = f.select :bank_account_id_eq, options_for_select(BankAccount.all.map{|p| [p.name, p.id]}), {:include_blank => true}
+  .form-group
+    = f.label :created_at, '从'
+    = f.text_field :created_at_gt, :"data-behaviour"=>'datepicker'
+    = f.label :created_at, "到"
+    = f.text_field :created_at_lt, :"data-behaviour"=>'datepicker'
+  = f.submit "搜索", :class=>"btn btn-default"
+
+:javascript
+  $(document).ready(function(){
+    $('[data-behaviour~=datepicker]').datepicker({
+      dateFormat: "yy-mm-dd"
+    });
+  })
+= link_to "全部流水", statistics_items_path, :class=>"btn btn-primary"
+%button.btn.btn-success{:data =>{:toggle=>"modal", :target=>"#export_items_modal"}} 下载流水
+%h1
+  - if @month_time.present?
+    = "#{@month_time.year}年#{@month_time.month}月流水统计"
+  - else
+    全部流水
+%table.table.table-striped.table-bordered
+  %thead
+    %tr
+      %th{:colspan=>2} 全部合计
+    %tr
+      %th.col-xs-5 项目
+      %th.col-xs-5 合计
+  %tbody
+    %tr
+      %td 累计收入
+      %td= number_to_currency(@accepted_sale_item_amount, :unit=>'¥')
+    %tr
+      %td 累计支出
+      %td= number_to_currency(@accepted_stock_items_amount, :unit=>'¥')
+#accordion.panel-group
+  - Member.all.each do |member|
+    .panel.panel-default
+      .panel-heading
+        .panel-title
+          %a{:data=>{:toggle=>"collapse", :parent=>"#accordion"}, :href=>"#member-#{member.id}"}
+            = member.name
+            = "累计收入(#{number_to_currency(@all_sale_items.applied_by(member).sum(:amount), :unit=>'¥')})"
+            = "累计支出(#{number_to_currency(@all_stock_items.applied_by(member).sum(:amount), :unit=>'¥')})"
+        .panel-collapse.collapse{:id=>"member-#{member.id}"}
+          .panel-body
+            %table.table.table-striped
+              %tr
+                %th.col-sm-2= Item.human_attribute_name(:name)
+                %th.col-sm-1= Item.human_attribute_name(:amount)
+                %th.col-sm-3= Item.human_attribute_name(:description)
+                %th.col-sm-2= Item.human_attribute_name(:transaction_time)
+                %th.col-sm-2= Item.human_attribute_name(:applier)
+                %th.col-sm-2= Item.human_attribute_name(:approver)
+              - @all_items.applied_by(member).each do |item|
+                %tr
+                  %td= item.name
+                  %td
+                    = number_to_currency(item.amount, :unit=>'¥')
+                    - if item.has_balance_due
+                      %br
+                      \(
+                      = SaleItem.human_attribute_name(:balance_due)
+                      \:
+                      %span.label.label-info
+                        = number_to_currency(item.balance_due, :unit=>"¥")
+                      \)
+                    %br
+                    - if item.is_sale_item? and item.bank_account.present?
+                      %b
+                        = SaleItem.human_attribute_name(:bank_account)
+                        \:
+                      = link_to item.bank_account.name, item.bank_account
+
+                  %td= item.description
+                  %td= item.transaction_time.strftime("%Y-%m-%d %H:%M:%S") rescue nil
+                  %td= item.applier.name
+                  %td= item.approver.name rescue nil
+
+
+.modal.fade#export_items_modal
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{:type=>"button", :data=>{:dismiss=>"modal"}, :"aria-hidden"=>"true"} &times;
+        %h4.modal-title 选择导出流水的条件
+      .modal-body
+        = form_for(@q, url: export_items_path(format: :csv),:html=>{:class=>"form-horizontal", :role=>"form"}) do |f|
+          .form-group
+            = f.label :applier_id, "经办人" , class: "col-sm-3 control-label"
+            .col-sm-9
+              = f.select :applier_id_eq, options_for_select(Member.all.map{|m| [m.name, m.id]}), {:include_blank => true}, :class=>"form-control"
+          .form-group
+            = f.label :bank_account_id, "银行账户" , class: "col-sm-3 control-label"
+            .col-sm-9
+              = f.select :bank_account_id_eq, options_for_select(BankAccount.all.map{|p| [p.name, p.id]}), {:include_blank => true}, :class=>"form-control"
+          .form-group
+            = f.label :created_at, '起止时间', :class=>"col-sm-3 control-label"
+            .col-sm-9
+              = f.text_field :created_at_gt, :placeholder=>"2014-01-04"
+              至
+              = f.text_field :created_at_lt, :placeholder=>"2014-02-03"
+          .col-sm-9.col-sm-offset-3
+            = f.submit "导出", :class=>"btn btn-primary"
+      .modal-footer
+        %button.btn.btn-default{:type=>"button", :"data-dismiss"=>"modal"} 关闭

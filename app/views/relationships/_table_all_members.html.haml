@@ -1,0 +1,18 @@
+= will_paginate @members, renderer: BootstrapPagination::Rails
+%table.table.table-striped#all_workers_table
+  %tr
+    %th= Member.human_attribute_name(:name)
+    %th= Member.human_attribute_name(:email)
+    %th= "操作"
+    %th
+  - @members.each do |member|
+    - if (!member.has_role? :admin) && (!member.has_role? :manager) && !member.was_managed?
+      %tr
+        %td= member.name
+        %td= member.email
+        %td
+          = form_for(@manager.active_relationships.build(worker_id: member.id), remote: true, ) do |f|
+            = hidden_field_tag :worker_id, member.id
+            = hidden_field_tag :manager_id, @manager.id
+            = f.submit "Add", :id => "add_form_#{member.id}", class: "btn btn-danger", :data => { :confirm => 'Are you sure?' }
+= will_paginate @members, renderer: BootstrapPagination::Rails

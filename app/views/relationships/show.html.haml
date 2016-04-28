@@ -1,0 +1,15 @@
+.panel.panel-primary
+  .panel-heading
+    %h2.panel-title 经理下属员工
+  .panel-body
+    %p
+      %b
+        = "经理" + Member.human_attribute_name(:name)
+        \:
+      %span= @manager.name
+    %br
+    %b= "下属员工列表"
+    = render "table_managed_worker"
+    %br
+    %b= "所有员工列表"
+    = render "table_all_members"

@@ -1,0 +1,47 @@
+%h1 最近拜访记录
+= search_form_for(@q, :html=>{:class=>"form-inline pull-right", :role=>"form"}) do |f|
+  .form-group.col-xs-4
+    = f.label '销售'
+    = f.text_field :visit_note_member_name_cont, :class=>"form-control"
+  .form-group.col-xs-4
+    = f.label :name
+    = f.text_field :name_cont, :class=>"form-control"
+  .form-group.col-xs-4
+    = f.label :wechat_number
+    = f.text_field :wechat_number_cont, :class=>"form-control"
+  .form-group.col-xs-4
+    = f.label '电话'
+    = f.text_field :phone_cont, :class=>"form-control"
+  .form-group.col-xs-4
+    = f.label '职位'
+    = f.text_field :pos_cont, :class=>"form-control"
+  .form-group.col-xs-4
+    = f.submit '搜索', :class=>'btn btn-default'
+
+= will_paginate @collection, renderer: BootstrapPagination::Rails
+%table.table.table-striped
+  %tr
+    %th 销售
+    %th= sort_link(@q, :name, Person.human_attribute_name(:name))
+    %th= sort_link(@q, :wechat_number, Person.human_attribute_name(:wechat_number))
+    %th= sort_link(@q, :phone, Person.human_attribute_name(:phone))
+    %th= sort_link(@q, :pos, Person.human_attribute_name(:pos))
+    %th= sort_link(@q, :visit_note_visit_at, VisitNote.human_attribute_name(:visit_at))
+    %th= sort_link(@q, :created_at, Person.human_attribute_name(:created_at))
+    %th= VisitNote.human_attribute_name(:visit_reason)
+    %th
+
+  - @people.each do |person|
+    %tr
+      %td= person.visit_note.member.try(:name)
+      %td= person.name
+      %td= person.wechat_number
+      %td= person.phone
+      %td= person.pos
+      %td= person.visit_note.visit_at.strftime("%Y-%m-%d %H:%M")
+      %td= person.created_at.strftime("%Y-%m-%d %H:%M")
+      %td= link_to person.visit_note.visit_reason, person.visit_note.customer
+      %td
+      
+
+= will_paginate @collection, renderer: BootstrapPagination::Rails

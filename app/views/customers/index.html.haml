@@ -1,0 +1,149 @@
+%h1 客户列表
+
+.row-fluid
+  = link_to '新添客户', new_customer_path, :class=>"btn btn-primary"
+  = link_to '导入客户', '', id: 'import-customers',  :class=>"btn btn-primary"
+
+  = search_form_for(@q, :html=>{:class=>"form-inline pull-right", :role=>"form"}) do |f|
+    .form-group.col-xs-4
+      = f.label :last_member_id
+      = f.select :last_member_id_eq, options_for_select(Member.all.map{|member| [member.name, member.id]}), {:include_blank => true}, class: "selectpicker", data: {:"live-search" => true}
+    .form-group.col-xs-4
+      = f.label :name
+      = f.text_field :name_cont, :class=>"form-control"
+    .form-group.col-xs-4
+      = f.label '电话'
+      = f.text_field :phones_number_cont, :class=>"form-control"
+    .form-group.col-xs-4
+      = f.label :qq
+      = f.text_field :qq_cont, :class=>"form-control"
+    .form-group.col-xs-4
+      = f.label :email
+      = f.text_field :email_cont, :class=>"form-control"
+    .form-group.col-xs-4
+      = f.label :workflow_state
+      = f.select :workflow_state_eq, options_for_select(Customer.workflow_spec.states.keys.map{|workflow_key| [I18n.t("customer.workflow_state.#{workflow_key}"), workflow_key] }), {:include_blank => true}, :class=>"form-control"
+    .form-group.col-xs-4
+      = f.label :pool
+      = f.select :pool_eq, options_for_select([['是', true],['否',false]]), {:include_blank => true}, :class=>'form-control'
+    .form-group.col-xs-8
+      = f.label :from
+      = f.select :from_eq, options_for_select(ConfigCustomer.from.map{|src, desc| [desc, src]}), {:include_blank => true}, :class => 'form-control'
+    .form-group.col-xs-4
+      = f.label :vip_level
+      = f.select :vip_level_eq, options_for_select(%w(potential normal important).map{|it|[t("customer.vip_level.#{it}"), it]}), {:include_blank => true}, :class => 'form-control'
+    .form-group.col-xs-4
+      = f.label :shop_type
+      = f.select :shop_type_eq, options_for_select(%w(single service chain multiple agent).map{|it|[t("customer.shop_type.#{it}"), it]}), {:include_blank => true}, :class => 'form-control'
+    .form-group.col-xs-4
+      = f.label :member_id
+      = f.select :member_id_eq,  options_for_select(Member.all.map{|member| [member.name, member.id]}), {:include_blank => true}, :class=>'selectpicker', data: {:"live-search" => true}
+    .form-group.col-xs-4
+      = f.label :province
+      = f.text_field :province_cont
+    .form-group.col-xs-4
+      = f.label :city
+      = f.text_field :city_cont
+    .form-group.col-xs-4
+      = f.label '创建时间大于'
+      = f.datetime_field :created_at_gteq, :class=>'form-control'
+    .form-group.col-xs-4
+      = f.label '创建时间小于'
+      = f.datetime_field :created_at_lteq, :class=>'form-control'
+    .form-group.col-xs-4
+      = f.label '最后更新时间大于'
+      = f.datetime_field :last_updated_at_gteq, :class=>'form-control'
+    .form-group.col-xs-4
+      = f.label '最后更新时间小于'
+      = f.datetime_field :last_updated_at_lteq, :class=>'form-control'
+    .form-group.col-xs-4
+      = f.submit '搜索', :class=>'btn btn-default'
+
+%br
+
+%table.table.table-striped
+  %tr
+    %th.col-sm-1= Customer.human_attribute_name(:name)
+    %th.col-sm-1= sort_link(@q, :province, Customer.human_attribute_name(:area))
+    %th.col-sm-1 联系方式
+    %th.col-sm-3= Customer.human_attribute_name(:introduction)
+    %th.col-sm-1= sort_link(@q, :member, Customer.human_attribute_name(:member))
+    %th.col-sm-1= sort_link(@q, :workflow_state, Customer.human_attribute_name(:workflow_state))
+    %th.col-sm-1= sort_link(@q, :level, Customer.human_attribute_name(:level))
+    %th.col-sm-1= sort_link(@q, :updated_at, Customer.human_attribute_name(:updated_at))
+    %th.col-sm-2
+
+  - @customers.each do |customer|
+    %tr
+      %td
+        = customer.name
+        - if customer.is_agent?
+          %span.label.label-success
+            = customer.agent_type_name
+
+      %td= "#{customer.province}-#{customer.city}"
+      %td
+        = "电话: #{customer.phones.map{|phone| [phone.number, phone.province, phone.city].join('-')}.join(', ')}"
+        %br
+        = "#{Customer.human_attribute_name(:email)}: #{customer.email}"
+        %br
+        = "#{Customer.human_attribute_name(:qq)}: #{customer.qq}"
+      %td= customer.introduction
+      %td= link_to customer.member.name||customer.member.email, customer.member
+      %td= customer.workflow_state_name
+      %td= "#{customer.level}分"
+      %td= customer.updated_at.strftime("%F %T")
+      %td
+        = link_to t('Show'), customer, :class=>"btn btn-default", target: '_blank'
+        = link_to t('Edit'), edit_customer_path(customer), :class=>"btn btn-default", target: '_blank'
+
+%br
+= will_paginate @collection, renderer: BootstrapPagination::Rails
+
+#import-customers-float{title: "上传产品文件"}
+  .import-result
+    %span.message
+    , 成功:
+    %span.success 0
+    , 失败:
+    %span.fail 0
+    , 失败的客户名称:
+    %span.fail-set
+  = link_to '下载模板文件', asset_path('customer_data.csv', type: :template), class: 'label label-success'
+  = form_tag import_customers_path, method: 'post', multipart: true, remote: true, authenticity_token: true, id: 'import-customers-form' do
+    .form-group
+      %label{for: 'file'} 选择文件
+      = file_field_tag 'file'
+    = submit_tag '导入'
+
+:javascript
+  $('.selectpicker').selectpicker();
+
+  $(function() {
+    $("#import-customers-float").dialog({
+      autoOpen: false,
+      width: 350
+    });
+    $("#import-customers").click(function(event) {
+      event.preventDefault(event);
+      $(".import-result").hide();
+      $("#import-customers-float").dialog("open");
+    });
+
+    // Parse the JSON response
+    $('#import-customers-form').on('ajax:success',function(event, data, status, xhr){
+      $(".import-result .message").html("导入完成");
+      var success_count = data.success_count
+      var fail_count = data.fail_count
+      var fail_customer_errors = data.fail_customer_errors
+      $(".import-result .success").html(success_count);
+      $(".import-result .fail").html(fail_count);
+      $(".import-result .fail-set").html(JSON.stringify(fail_customer_errors));
+      $(".import-result").show();
+    });
+    $('#import-customers-form').on('ajax:error',function(event, data, status, xhr){
+      $(".import-result .message").html("发生异常");
+      $(".import-result").show();
+    });
+  });
+

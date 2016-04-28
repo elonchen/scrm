@@ -1,0 +1,8 @@
+defaults: &defaults
+  key: 584fb2e8f435f2b98f4ccb960fda2d86
+  host: http://apis.juhe.cn
+development:
+  <<: *defaults
+
+production:
+  <<: *defaults

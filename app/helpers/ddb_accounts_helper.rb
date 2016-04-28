@@ -1,0 +1,2 @@
+module DdbAccountsHelper
+end

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= content_for?(:title) ? yield(:title) : "塑梦客户关系管理系统" %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+    <%= javascript_include_tag "thirdparty", "data-turbolinks-track" => true %>
+    <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+    <%= csrf_meta_tags %>
+    <%= yield(:head) %>
+</head>
+<body>
+  <div class="container">
+    <% if member_signed_in? %>
+      <nav class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid">
+          <!-- Brand and toggle get grouped for better mobile display -->
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+              <span class="sr-only">切换导航栏</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">塑梦客户关系管理系统</a>
+          </div>
+
+          <!-- Collect the nav links, forms, and other content for toggling -->
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <% if controller_name == 'navigations' %>
+                <li class="active">
+              <% else %>
+                <li>
+              <% end %>
+                <%= link_to '网址导航', navigations_path %></li>
+
+              <% if controller_name == 'activities' %>
+                <li class="active">
+              <% else %>
+                <li>
+              <% end %>
+                <%= link_to '最近活动', activities_path %></li>
+
+
+              <% if  %w(customers ddb_accounts zones faqs statistics_notes_path).include? controller_name %>
+                <li class="dropdown active">
+              <% else %>
+                <li class="dropdown">
+              <% end %>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">客户 <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+
+                  <li><%= link_to '客户', customers_path %></li>
+                  <li><%= link_to '点单宝帐号', ddb_accounts_path %></li>
+                  <li><%= link_to '区域', zones_path %></li>
+                  <li><%= link_to '常见客户问题解答', faqs_path %></li>
+                  <% if current_member.has_role? :admin %>
+                    <li><%= link_to '拜访记录', people_path %></li>
+                    <li><%= link_to '沟通记录统计', statistics_notes_path %></li>
+                    <li><%= link_to '沟通记录统计(按天)', statistics_by_day_notes_path %></li>
+                  <% end %>
+                </ul>
+              </li>
+
+              <% if  %w(items sale_items stock_items bank_accounts statistics_items system_configs).include? controller_name %>
+                <li class="dropdown active">
+              <% else %>
+                <li class="dropdown">
+              <% end %>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">财务 <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><%= link_to '财务流水', items_path %></li>
+                  <li class="divider"></li>
+                  <li><%= link_to '收入流水', sale_items_path %></li>
+                  <li><%= link_to '支出流水', stock_items_path %></li>
+                  <li class="divider"></li>
+                  <li><%= link_to '银行账户', bank_accounts_path %></li>
+                  <% if current_member.has_role? :admin %>
+                    <li><%= link_to '财务报表', statistics_items_path %></li>
+                    <li><%= link_to '系统设置', system_configs_path %></li>
+                  <% end %>
+                </ul>
+              </li>
+
+              <% if current_member.has_role? :admin %>
+                <% if  %w(products orders members departments).include? controller_name %>
+                  <li class="dropdown active">
+                <% else %>
+                  <li class="dropdown">
+                <% end %>
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">其他管理 <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li><%= link_to '产品', products_path %></li>
+                    <li><%= link_to '订单', orders_path %></li>
+                    <li class="divider"></li>
+                    <li><%= link_to '同事', members_path %></li>
+                    <li><%= link_to '部门', departments_path %></li>
+                  </ul>
+                </li>
+              <% end %>
+
+
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <% if controller_name == 'members' and @member==current_member %>
+                <li class="active">
+              <% else %>
+                <li>
+              <% end %>
+                <%= link_to "#{current_member.name||current_member.email}(#{role_name(current_member)})", current_member%></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">会话安全 <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><%= link_to '修改密码', edit_member_registration_path%></li>
+                  <li class="divider"></li>
+                  <li><%= link_to '安全退出', destroy_member_session_path, :method=>'DELETE'%></li>
+                </ul>
+              </li>
+            </ul>
+          </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+      </nav>
+
+      <%= render 'alarms/alarm' %>
+
+      <div class="alert alert-warning">
+        <p>今日沟通数据:</p>
+        <ul style="padding: 0;">
+          <% Member.of_normal.each do |member| %>
+            <li><%= member.name %>当日累计与<%= member.notes.of_today.map(&:customer_id).uniq.count %>个客户沟通，录入了<%= member.notes.of_communication_notes.of_today.count %>条沟通记录,<%= member.notes.of_visit_notes.of_today.count %>条客户拜访记录</li>
+          <% end %>
+        </ul>
+      </div>
+      <% if controller_name == 'activities' %>
+        <% @customers_to_contact = Customer.need_to_contact_for(current_member).paginate(:page => params[:customer_page], :per_page => 60) %>
+        <% @customers_to_contact.each do |customer| %>
+          <% if customer.last_member == current_member && !customer.rejected? %>
+            <div class="alert alert-danger alert-dismissable">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                您的客户<%= link_to customer.name, customer %>(状态: <%= customer.workflow_state_name %>)已经很久没有与您联系了，您需要及时联系并添加沟通记录，否则您的同事会抢走您的客户的
+            </div>
+          <% else %>
+            <div class="alert alert-info alert-dismissable">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+              <%= link_to customer.last_member.name, customer.last_member %>
+              的客户<%= link_to customer.name, customer %>(状态: <%= customer.workflow_state_name %>)已经很久没有与他联系了，请你赶紧跟进，接单后该客户绩效将算做你的
+            </div>
+          <% end %>
+        <% end %>
+        <%= will_paginate @customers_to_contact, renderer: BootstrapPagination::Rails, param_name: :customer_page %>
+      <% end %>
+    <% end %>
+    <%= content_tag :h1, yield(:title) if show_title? %>
+
+    <% if notice %>
+      <div class="notice alert alert-success"><%= notice %></div>
+    <% end %>
+    <% if alert %>
+      <div class="alert alert-danger"><%= alert %></div
+    <% end %>
+    <%= yield %>
+  </div>
+</body>
+</html>
+

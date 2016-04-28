@@ -1,0 +1,13 @@
+//= require jquery
+//= require jquery_ujs
+//= require turbolinks
+//= require bootstrap
+//= require jquery_nested_form
+//= require bootstrap-select
+//= require ckeditor/init
+//= require bootstrap-datepicker
+//= require bootbox.min
+//= require jquery-ui
+//= require SimpleAjaxUploader.min
+//= require select2
+//= require dd-select2

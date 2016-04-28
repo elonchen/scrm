@@ -1,0 +1,46 @@
+%p#notice= notice
+
+%p
+  %b
+    = DdbAccount.human_attribute_name(:name)
+    \:
+  = @ddb_account.name
+%p
+  %b
+    = DdbAccount.human_attribute_name(:customer)
+    \:
+  = link_to @ddb_account.customer.name, @ddb_account.customer
+%p
+  %b
+    = DdbAccount.human_attribute_name(:email)
+    \:
+  = @ddb_account.email
+%p
+  %b
+    = DdbAccount.human_attribute_name(:slug)
+    \:
+  = @ddb_account.slug
+%p
+  %b
+    = DdbAccount.human_attribute_name(:phone)
+    \:
+  = @ddb_account.phone
+%p
+  %b
+    = DdbAccount.human_attribute_name(:title)
+    \:
+  = @ddb_account.title
+%p
+  %b
+    = DdbAccount.human_attribute_name(:zone)
+    \:
+  = @ddb_account.zone.name rescue nil
+%p
+  %b
+    = DdbAccount.human_attribute_name(:member)
+    \:
+  = @ddb_account.member.name rescue nil
+
+= link_to t('Edit'), edit_ddb_account_path(@ddb_account), :class=>"btn btn-default"
+\|
+= link_to t('Back'), ddb_accounts_path, :class=>"btn btn-default"

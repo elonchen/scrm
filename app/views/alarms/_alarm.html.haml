@@ -1,0 +1,26 @@
+- alarms = current_member.alarms.open
+- if alarms.present?
+  .alert.alert-danger
+    %p 提醒
+    %ul
+      - alarms.each do |alarm|
+        %li
+          = link_to alarm.link do
+            %span(style='color:red')
+              = alarm.description
+            %span(style='color:black')
+              (
+            %span(style='color:green')
+              = distance_of_time_in_words(Time.now, alarm.time)
+              = Time.now < alarm.time ? '后' : '前'
+            %span(style='color:black')
+              )
+          = link_to close_alarm_path(alarm), method: :post, remote: true, class:'close_alarm_link' do
+            %span.pull-right x
+
+:javascript
+  $('.close_alarm_link').on('ajax:success',function(event, data, status, xhr){
+    if (data.success == true){
+      $(this).parent().detach()
+    }
+  });

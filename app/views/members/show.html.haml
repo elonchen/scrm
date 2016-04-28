@@ -1,0 +1,79 @@
+.panel.panel-primary
+  .panel-heading
+    %h2.panel-title 账户详情
+  .panel-body
+    %p
+      %b
+        = Member.human_attribute_name(:email)
+        \:
+      %span= @member.email
+    %p
+      %b
+        = Member.human_attribute_name(:department)
+        \:
+      %span= @member.department.try(:name)
+    %p
+      %b
+        = Member.human_attribute_name(:bank_card_type)
+        \:
+      %span= @member.try(:bank_card_type)
+    %p
+      %b
+        = Member.human_attribute_name(:bank_card_number)
+        \:
+      %span= @member.try(:bank_card_number)
+    %p
+      %b
+        = Member.human_attribute_name(:is_blocked)
+        \:
+      %span= @member.is_blocked? ? "已阻止" : "正常"
+    %p
+      %b
+        = Member.human_attribute_name(:name)
+        \:
+      %span= @member.name
+    %p
+      %b
+        = Member.human_attribute_name(:can_accept_new)
+        \:
+      %span= @member.can_accept_new? ? "可以" : "不可以"
+    %p
+      %b
+        = Member.human_attribute_name(:role)
+        \:
+      %span= role_name(@member)
+    %p
+      %b
+        = Member.human_attribute_name(:customer_share_threshold)
+        \:
+      %span= "#{@member.customer_share_threshold*100}%"
+    %p
+      %b
+        他接管的客户数量
+        \:
+      %span= Customer.managed_by(@member.id).count
+
+    %h4= "他/她 开发的客户(数量：#{@member.customers_count}, 总计客户数量#{Customer.count})"
+
+    %table.table.table-striped
+      %tr
+        %th= Customer.human_attribute_name(:name)
+        %th 联系方式
+        %th= Customer.human_attribute_name(:introduction)
+        %th
+
+      - @member.customers.each do |customer|
+        %tr
+          %td= customer.name
+          %td
+            = "#{Customer.human_attribute_name(:tel)}: #{customer.tel}"
+            %br
+            = "#{Customer.human_attribute_name(:email)}: #{customer.email}"
+            %br
+            = "#{Customer.human_attribute_name(:qq)}: #{customer.qq}"
+          %td= customer.introduction
+          %td
+            = link_to t('Show'), customer, :class=>"btn btn-default"
+            = link_to t('Edit'), edit_customer_path(customer), :class=>"btn btn-default"
+
+= link_to '返回账户列表', members_path, :class=>"btn btn-default"

@@ -1,0 +1,21 @@
+%p#notice= notice
+
+%p
+  %b
+    = Product.human_attribute_name(:name)
+    \:
+  = @product.name
+%p
+  %b
+    = Product.human_attribute_name(:price)
+    \:
+  = number_to_currency(@product.price, :unit=>"¥")
+%p
+  %b
+    = Product.human_attribute_name(:description)
+    \:
+  = @product.description
+
+= link_to t('Edit'), edit_product_path(@product), :class=>"btn btn-default"
+\|
+= link_to t('Back'), products_path, :class=>"btn btn-default"

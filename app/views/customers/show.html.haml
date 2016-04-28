@@ -1,0 +1,251 @@
+.panel.panel-default
+  .panel-heading 客户详情
+  .panel-body
+    %p
+      %b
+        = Customer.human_attribute_name(:name)
+        \:
+      = @customer.name
+    %p
+      %b
+        = Customer.human_attribute_name(:level)
+        \:
+      = form_for @customer do |f|
+        = f.select :level, options_for_select((1..100).to_a.reverse, selected: @customer.level)
+        = f.submit '修改客户质量', :class=>"btn btn-default"
+    %p
+      %b
+        = Customer.human_attribute_name(:area)
+        \:
+      = "#{@customer.province}-#{@customer.city}"
+    %p
+      %b
+        = Customer.human_attribute_name(:wechat_number)
+        \:
+      = @customer.wechat_number
+    %p
+      %b
+        = Customer.human_attribute_name(:created_at)
+        \:
+      = @customer.created_at.localtime.strftime("%Y-%m-%d %H:%M:%S")
+    %p
+      %b
+        = Customer.human_attribute_name(:workflow_state)
+        \:
+      %span.label.label-info= @customer.workflow_state_name
+    %p
+      %b
+        = '电话列表:'
+    %ul
+      - @customer.phones.each do |phone|
+        %li= link_to "#{phone.number} (#{phone.province}-#{phone.city})", "tel:#{phone.number}", :class=>'btn btn-default'
+    %p
+      %b
+        = Customer.human_attribute_name(:email)
+        \:
+      = @customer.email
+    %p
+      %b
+        = Customer.human_attribute_name(:qq)
+        \:
+      = @customer.qq
+    %p
+      %b
+        = Customer.human_attribute_name(:from)
+        \:
+      = ConfigCustomer.from[@customer.from]
+    %p
+      %b
+        = Customer.human_attribute_name(:vip_level)
+        \:
+      = t("customer.vip_level.#{@customer.vip_level}")
+    %p
+      %b
+        = Customer.human_attribute_name(:shop_type)
+        \:
+      = t("customer.shop_type.#{@customer.shop_type}") if @customer.shop_type.present?
+    %p
+      %b
+        = Customer.human_attribute_name(:is_agent)
+        \:
+      = @customer.is_agent ? "是" : "否"
+    - if @customer.is_agent
+      %p
+        %b
+          = Customer.human_attribute_name(:agent_type)
+          \:
+        = @customer.agent_type_name rescue nil
+    %p
+      %b
+        = Customer.human_attribute_name(:pool)
+        \:
+      = @customer.in_pool? ? '是' : '否'
+    %p
+      %b
+        = Customer.human_attribute_name(:member)
+        \:
+      = link_to @customer.member.name||@customer.member.email, @customer.member
+    %p
+      %b
+        = Customer.human_attribute_name(:last_member)
+        \:
+      = link_to @customer.last_member.name||@customer.last_member.email, @customer.last_member
+      - if current_member.is_admin?
+        = form_for @customer do |f|
+          = f.select :last_member_id, options_for_select(Member.all.of_normal.map{|m| [m.name, m.id]}, selected: @customer.last_member_id)
+          = f.submit '修改接管销售', :class=>"btn btn-default"
+    %p
+      %b
+        = Customer.human_attribute_name(:last_updated_at)
+        \:
+      = @customer.last_updated_at.localtime.strftime("%Y-%m-%d %H:%M:%S")
+    %p
+      %b
+        = Customer.human_attribute_name(:introduction)
+        \:
+      = @customer.introduction
+
+.panel.panel-primary
+  .panel-heading 销售记录
+  .panel-body
+    %table.table.table-striped
+      %thead
+        %tr
+          %td= Note.human_attribute_name(:order_id)
+          %td= Product.human_attribute_name(:name)
+          %td= TransactionRecord.human_attribute_name(:amount)
+          %td= TransactionRecord.human_attribute_name(:member)
+          %td
+      %tbody
+        - @customer.transaction_records.each do |transaction_record|
+          %tr
+            - if transaction_record == transaction_record.note.transaction_records.first
+              %td{:rowspan=>transaction_record.note.transaction_records.length}
+                = link_to transaction_record.note.order.human_order_id, transaction_record.note.order
+            %td= link_to transaction_record.product.name, transaction_record.product
+            %td= number_to_currency(transaction_record.amount, :unit=>'¥')
+            %td= link_to transaction_record.saler.name, transaction_record.saler
+            - if (transaction_record == transaction_record.note.transaction_records.first)
+              %td{:rowspan=>transaction_record.note.transaction_records.length}
+
+                - if current_member.has_role? :admin and transaction_record.order.current_state != :closed
+                  = link_to '取消订单', close_order_path(transaction_record.note.order),:data => { :confirm => '您确定要取消订单?' }, :method=>"put", :class=>"btn btn-danger"
+                - elsif transaction_record.order.current_state != :closed
+                  %span.label.label-success
+                    = transaction_record.order.workflow_state_name
+                - else
+                  %span.label.label-danger
+                    = transaction_record.order.workflow_state_name
+
+
+
+.panel.panel-success
+  .panel-heading 客户沟通记录
+  .panel-body
+    - if @customer.can_manage_by(current_member)
+      = link_to '新添沟通记录', new_customer_communication_note_path(@customer), :class=>"btn btn-primary"
+      = link_to '新添拜访记录', new_customer_visit_note_path(@customer), :class=>"btn btn-success"
+    %table.table.table-striped
+      %tbody
+        - unless @notes.empty?
+          - @notes.each do |note|
+            %tr
+              %td
+                %span.label.label-info
+                  = link_to note.member.name||note.member.email, note.member
+                - if note.created_at < 3.days.ago
+                  = "于#{note.created_at.strftime("%Y-%m-%d %H:%M:%S")}"
+                - else
+                  = "于#{time_ago_in_words(note.created_at)}前"
+                提交的
+                - if note.is_visit_note?
+                  %span.label.label-success 拜访记录
+                - else
+                  %span.label.label-info 沟通记录
+
+
+                %br
+                - if note.is_visit_note?
+                  %b
+                    = Person.human_attribute_name(:name)
+                    \:
+                  = note.person.name
+                  %br
+                  %b
+                    = Person.human_attribute_name(:phone)
+                    \:
+                  = note.person.phone
+                  %br
+                  %b
+                    = Person.human_attribute_name(:wechat_number)
+                    \:
+                  = note.person.wechat_number
+                  %br
+                  %b
+                    = Person.human_attribute_name(:pos)
+                    \:
+                  = note.person.pos
+                  %br
+                  %b
+                    = VisitNote.human_attribute_name(:visit_at)
+                    \:
+                  = note.visit_at.strftime("%Y-%m-%d %H:%M")
+                  %br
+
+                  %b
+                    = VisitNote.human_attribute_name(:visit_reason)
+                    \:
+                  = note.visit_reason
+                  %br
+                %b
+                  = Note.human_attribute_name(:content)
+                  \:
+                = note.content
+                - if note.from_state != note.to_state
+                  %br
+                  %b
+                    = Note.human_attribute_name(:workflow_state)
+                    \:
+                  = raw "从状态<strong>#{workflow_state_name(note.from_state)}</strong>修改为状态<strong>#{workflow_state_name(note.to_state)}</strong>"
+                - if note.event === "pay"
+                  %br
+                    %b
+                      本次沟通成交
+                      .span.label.label-success
+                        = link_to "订单#{note.order.human_order_id rescue nil}", note.order
+                      产品:
+                  - note.transaction_records.each do |transaction_record|
+                    %p{ :style=>"text-indent:2em;" }
+                      %b
+                        = Product.human_attribute_name(:name)
+                        \:
+                      = link_to transaction_record.product.name, transaction_record.product
+                      %b
+                        = TransactionRecord.human_attribute_name(:amount)
+                        \:
+                      %span.label.label-success
+                        = number_to_currency(transaction_record.amount, :unit=>'¥')
+                      %b
+                        = TransactionRecord.human_attribute_name(:saler)
+                        \:
+                      = transaction_record.saler.email
+                      %b
+                        = TransactionRecord.human_attribute_name(:member)
+                        \:
+                      = link_to transaction_record.member.name||transaction_record.member.email, transaction_record.member
+
+
+
+              %td
+                - if note.created_at > 24.hour.ago and note.member == @current_member
+                  = link_to '修改沟通记录', [:edit, @customer, note], :class=>"btn btn-default"
+                - if current_member.is_admin?
+                  = link_to t('Destroy'), [@customer, note], :method => :delete, :data => { :confirm => '确定删除本沟通记录?' }, :class=>"btn btn-danger"
+        - else
+          %tr
+            %td 暂无沟通记录
+
+- unless @customer.destroyed?
+  = link_to t('Edit'), edit_customer_path(@customer), :class=>"btn btn-default"
+  \|
+  = link_to t('Back'), customers_path, :class=>"btn btn-default"

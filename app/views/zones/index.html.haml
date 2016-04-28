@@ -1,0 +1,12 @@
+%h1 区域列表
+= search_form_for(@q, :html=>{:class=>"form-inline", :role=>"form", :style=>"margin: 10px;"}) do |f|
+  .form-group
+    = f.label :name
+    = f.text_field :name_cont, :class=>"form-control"
+  = f.submit "搜索", :class=>"btn btn-default"
+
+= render :partial=>"index_records", :locals=>{zones: @zones}
+
+%br
+
+= link_to '新建区域', new_zone_path, :class=>"btn btn-default"

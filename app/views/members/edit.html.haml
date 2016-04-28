@@ -1,0 +1,21 @@
+= simple_form_for @member do |f|
+  - if @member.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@member.errors.count, "error")} prohibited this customer from being saved:"
+      %ul
+        - @member.errors.full_messages.each do |msg|
+          %li= msg
+  - if current_member.has_role? :admin
+    = f.input :email
+    = f.association :department
+    = f.input :bank_card_type, collection: Member::BANK_CARD_TYPES
+    = f.input :bank_card_number
+    = f.input :is_blocked
+  - else
+    = f.input :email, disabled: true
+  = f.input :name
+  - if current_member.has_role? :admin
+    = f.input :can_accept_new
+    = f.input :customer_share_threshold
+  = f.submit t('Save'), :class=>"btn btn-default"
+

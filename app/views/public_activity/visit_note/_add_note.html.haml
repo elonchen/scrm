@@ -1,0 +1,8 @@
+为客户
+= link_to_customer activity.trackable
+添加了一条拜访记录
+- unless activity.recipient
+  ,但是该沟通记录当前已经被删除
+%br
+%small
+  = raw update_state_reason(activity).join('<br/>')

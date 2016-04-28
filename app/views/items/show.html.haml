@@ -1,0 +1,131 @@
+
+%p#notice= notice
+.panel.panel-default
+  .panel-heading 流水详情
+  .panel-body
+    %p
+      %b
+        = Item.human_attribute_name(:name)
+        \:
+      = @item.name
+    %p
+      %b
+        = Item.human_attribute_name(:department)
+        \:
+      = @item.department.try(:name)
+    %p
+      %b
+        = Item.human_attribute_name(:type)
+        \:
+      = item_type_name(@item)
+    %p
+      %b
+        = Item.human_attribute_name(:workflow_state)
+        \:
+      %span.label.label-info
+        = @item.workflow_state_name
+    %p
+      %b
+        = Item.human_attribute_name(:reason)
+        \:
+      = @item.reason
+    %p
+      %b
+        = Item.human_attribute_name(:amount)
+        \:
+      = number_to_currency(@item.amount, :unit=>"¥")
+
+    %p
+      %b
+        = Item.human_attribute_name(:transaction_time)
+        \:
+      = @item.transaction_time.strftime("%Y-%m-%d %H:%M:%S") rescue nil
+
+    %p
+      %b
+        = Item.human_attribute_name(:description)
+        \:
+      = @item.description
+
+    - if @item.is_sale_item?
+      %p
+        %b
+          = SaleItem.human_attribute_name(:partner) 
+          \:
+        - if @item.partner.present?
+          = link_to @item.partner.try(:name), @item.partner
+        - else
+          无
+      %p
+        %b
+          = SaleItem.human_attribute_name(:invoice)
+          \:
+        = @item.invoice.presence||"<无>"
+
+      -if @item.bank_account.present?
+        %p
+          %b
+            = SaleItem.human_attribute_name(:bank_account)
+            \:
+          = link_to @item.bank_account.name, @item.bank_account
+      %p
+        %b
+          = SaleItem.human_attribute_name(:order)
+          \:
+        = link_to @item.order.human_order_id, @item.order
+      %p
+        %b
+          = SaleItem.human_attribute_name(:ddb_account)
+          \:
+        - if @item.ddb_account.present?
+          = link_to @item.ddb_account.title, @item.ddb_account
+      %p
+        %b
+          = SaleItem.human_attribute_name(:time_gap)
+          \:
+        = @item.time_gap
+      %p
+        %b
+          = SaleItem.human_attribute_name(:has_balance_due)
+          \:
+        - if @item.has_balance_due?
+          %span.label.label-success 有
+        - else
+          没有
+      - if @item.has_balance_due?
+        %p
+          %b
+            = SaleItem.human_attribute_name(:balance_due)
+            \:
+          = number_to_currency(@item.balance_due, :unit=>"¥")
+        %p
+          %b
+            = SaleItem.human_attribute_name(:due_date)
+            \:
+          = @item.due_date.strftime("%Y-%m-%d %H:%M:%S")
+        - if @item.due_item.present?
+          %p
+            %b
+              = SaleItem.human_attribute_name(:due_item)
+              \:
+            = link_to @item.due_item.name, @item.due_item
+
+    %p
+      %b
+        = Item.human_attribute_name(:applier)
+        \:
+      = @item.applier.name rescue nil
+    %p
+      %b
+        = Item.human_attribute_name(:approver)
+        \:
+      = @item.approver.name rescue nil
+    %p
+      - if current_member == @item.applier and @item.current_state == :new
+        = link_to t('Cancel'), sti_item_path(@item.type, @item, 'cancel'), :method => :put, :data => { :confirm => '你确定要关闭此项申请吗？?' }, :class=>"btn btn-danger"
+      - if current_member.has_role? :admin and @item.current_state == :new
+        = link_to t('Reject'), sti_item_path(@item.type, @item, 'reject'), :method => :put, :data => { :confirm => '你确定要拒绝此项流水吗？?' }, :class=>"btn btn-danger"
+        = link_to t('Accept'), sti_item_path(@item.type, @item, 'accept'), :method => :put, :data => { :confirm => '你确定要批准此项流水吗？?' }, :class=>"btn btn-danger"
+%br
+
+= link_to t('Back'), sti_item_path(@item.type, nil, nil), :class=>"btn btn-default"

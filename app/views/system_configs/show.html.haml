@@ -1,0 +1,16 @@
+%p#notice= notice
+
+%p
+  %b
+    = SystemConfig.human_attribute_name(:key)
+    \:
+  = @system_config.key
+%p
+  %b
+    = SystemConfig.human_attribute_name(:value)
+    \:
+  = @system_config.value
+
+= link_to t('Edit'), edit_system_config_path(@system_config), :class=>"btn btn-default"
+\|
+= link_to t('Back'), system_configs_path, :class=>"btn btn-default"

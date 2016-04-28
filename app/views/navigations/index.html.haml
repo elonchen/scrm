@@ -1,0 +1,21 @@
+%h1 网址导航
+
+%table.table.table-striped
+  %tr
+    %th 网站名称
+    %th 网址
+    - if current_member.has_role? :admin
+      %th
+
+  - @navigations.each do |navigation|
+    %tr
+      %td= link_to navigation.name, navigation.link
+      %td= link_to navigation.link,navigation.link
+      - if current_member.has_role? :admin
+        %td
+          = link_to t('Edit'), edit_navigation_path(navigation), :class=>"btn btn-default"
+          = link_to t('Destroy'), navigation, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class=>"btn btn-danger"
+
+%br
+- if current_member.has_role? :admin
+  = link_to '新添网址', new_navigation_path, :class=>"btn btn-default"

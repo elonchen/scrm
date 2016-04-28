@@ -1,0 +1,6 @@
+
+<% title @note.is_communication_note? ? "新建沟通记录" : "新建拜访记录" %>
+
+<%= render 'form' %>
+
+<p><%= link_to "返回客户沟通记录", @customer, :class=>"btn btn-default" %></p>

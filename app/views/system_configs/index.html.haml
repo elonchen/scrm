@@ -1,0 +1,20 @@
+%h1 系统设置列表
+
+%table.table.table-striped
+  %tr
+    %th= SystemConfig.human_attribute_name(:key)
+    %th= SystemConfig.human_attribute_name(:value)
+    %th
+
+  - @system_configs.each do |system_config|
+    %tr
+      %td= system_config.key
+      %td= system_config.value
+      %td
+        = link_to t('Show'), system_config, :class=>"btn btn-default"
+        = link_to t('Edit'), edit_system_config_path(system_config), :class=>"btn btn-default"
+        = link_to t('Destroy'), system_config, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class=>"btn btn-default"
+
+%br
+
+= link_to '新建系统设置', new_system_config_path, :class=>"btn btn-default"

@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  type: 
+  amount: 9.99
+  saler_id: 
+  products_id: 
+  description: MyText
+  customer_id: 
+  ddb_account_id: 
+  time_gap: MyString
+  applier_id: 
+  approver_id: 
+
+two:
+  name: MyString
+  type: 
+  amount: 9.99
+  saler_id: 
+  products_id: 
+  description: MyText
+  customer_id: 
+  ddb_account_id: 
+  time_gap: MyString
+  applier_id: 
+  approver_id: 

@@ -1,0 +1,28 @@
+%h1 账户列表
+%table.table.table-striped
+  %thead
+    %tr
+      %th= Member.human_attribute_name(:name)
+      %th= Member.human_attribute_name(:customers_count)
+      %th= Member.human_attribute_name(:department_id)
+      %th= Member.human_attribute_name(:role)
+      %th= Member.human_attribute_name(:is_blocked)
+      %th
+  %tbody
+    - @members.each do |member|
+      %tr
+        %td= member.name ? "#{member.name}(#{member.email})" : member.email
+        %td= "#{member.customers_count}位"
+        %td= member.department.try(:name)
+        %td= role_name(member)
+        %td
+          - if member.is_blocked?
+            %span.label.label-default 禁止
+          - else
+            %span.label.label-success 正常
+        %td
+          = link_to t('Show'), member, :class=>"btn btn-default"
+          - if member == current_member or current_member.has_role? :admin
+            = link_to t('Edit'), edit_member_path(member), :class=>"btn btn-default"
+- if current_member.has_role? :admin
+  = link_to '新建帐号', new_member_path, :class=>"btn btn-default"

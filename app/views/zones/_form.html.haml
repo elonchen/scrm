@@ -1,0 +1,10 @@
+= simple_form_for(@zone) do |f|
+  = f.error_notification
+
+  .form-inputs
+    = f.input :name
+    = f.input :zone_type, collection: ["province", "capital", "city", "town"].map{|zone_type| [t("zone.zone_type.#{zone_type}"), zone_type]}
+    = f.association :parent_zone
+
+  .form-actions
+    = f.button :submit

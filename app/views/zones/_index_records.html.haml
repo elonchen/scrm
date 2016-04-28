@@ -1,0 +1,23 @@
+%table.table.table-striped
+  %tr
+    %th= Zone.human_attribute_name(:name)
+    %th= Zone.human_attribute_name(:zone_type)
+    %th= Zone.human_attribute_name(:parent_zone)
+    %th
+
+  - zones.each do |zone|
+    %tr
+      %td
+        = zone.name
+        - if zone.agents.exclusive_agent.present?
+          %span.label.label-success
+            有独家代理
+        - else
+          %span.label.label-info
+            没有独家代理
+      %td= zone.zone_type_name
+      %td= zone.parent_zone.name rescue nil
+      %td
+        = link_to t('Show'), zone, :class=>"btn btn-default"
+        = link_to t('Edit'), edit_zone_path(zone), :class=>"btn btn-default"
+        = link_to t('Destroy'), zone, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class=>"btn btn-default"

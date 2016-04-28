@@ -1,0 +1,26 @@
+defaults: &defaults
+  max_idle_days: 5
+  from:
+    website: 官网(5%提点，浮动)
+    taobao: 淘宝(5%提点，浮动)
+    qqpromotion: 营销QQ(5%提点，浮动)
+    wechat: 微信(5%提点，浮动)
+    recommend: 客户推荐(5%提点，浮动)
+    bbs: 论坛(5%提点，浮动)
+    w58com: 58网(5%提点，浮动)
+    ganjicom: 赶集网(5%提点，浮动)
+    zhaopin: 招聘网站(5%提点，浮动)
+    other_website: 其他网站平台(5%提点，浮动)
+    collect_by_my_self: 自行百度搜集渠道信息(普通客户按5%提点，代理商按10%提点，浮动)
+    collect_by_exhibition: 展会(10%提点，浮动)
+    collect_by_walk_promotion: 地推客户(30%提点，固定)
+    collect_by_walk_promotion: 运营部大型连锁客户搜集(30%提点，固定)
+
+
+
+development:
+  <<: *defaults
+production:
+  <<: *defaults
+test:
+  <<: *defaults
