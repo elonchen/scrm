@@ -84,3 +84,8 @@ gem 'paper_trail', '~> 4.0.0.rc'
 gem 'roo', '~> 2.1.0'
 gem 'iconv'
 gem "select2-rails"
+
+group :production do
+	gem 'pg', '0.17.1'
+	gem 'rails_12factor', '0.0.2'
+end
