@@ -5,8 +5,7 @@ ruby '2.1.6'
 gem 'rails', '4.0.1'
 
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3'
-
+gem 'sqlite3',  group: [:development, :test]
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.0'
 
@@ -76,7 +75,7 @@ gem 'settingslogic'
 gem 'sidekiq', '3.2.1'
 gem 'whenever'
 gem 'jquery-ui-rails', '~> 5.0.0'
-gem 'nokogiri'
+gem 'nokogiri', group: [:development, :test]
 gem 'foreman', '0.63.0'
 gem 'puma'
 gem 'exception_notification'
